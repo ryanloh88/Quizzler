@@ -15,9 +15,13 @@ class QuizBrain {
     var previousQuestions:[Int] = []
     var questionBank : [Question] = []
     
+    
     let quizCategory = ["general knowledge":9, "books":10 , "film":11, "music":12, "music and theatres":13, "television":14, "video games":15, "board games":16, "science and nature":17, "computers":18, "math":19, "mythology":20, "sports":21, "geography":22, "history":23, "politics":24, "art":25, "celebrities":26, "animals":27, "vehicles":28, "comics":29, "science gadgets":30, "japanese anime and manga":31, "cartoon and animations":32]
     
     let quizCategories = ["general knowledge","books","film", "music", "music and theatres", "television", "video games", "board games", "science and nature", "computers", "math", "mythology", "sports", "geography", "history", "politics", "art","celebrities","animals","vehicles","comics","science gadgets", "japanese anime and manga", "cartoon and animations"]
+    func getType() -> String{
+        return questionBank[questionNumber].type
+    }
     
     func getChoices(choice : Int) -> String{
         switch choice {
@@ -33,9 +37,6 @@ class QuizBrain {
             return "error"
         }
     }
-
-   
-
  
     func checkAnswer(answer: String) -> Bool{
         if questionBank[questionNumber].ans.lowercased() == answer{
@@ -63,6 +64,14 @@ class QuizBrain {
             questionNumber = Int.random(in:0...(questionBank.count - 1))
         }
         previousQuestions.append(questionNumber)
+    }
+    func reset(){
+        numOfCurrentQn = 0
+        totalNum = 0
+        questionNumber = 0
+        score = 0
+        previousQuestions = []
+        questionBank = []
     }
 
 }

@@ -32,16 +32,15 @@ class QuestionController: UIViewController {
     @IBOutlet weak var choiceD: UIButton!
     
     @IBOutlet weak var submitPressed: UIButton!
+    
     var currentNumOfQn = 1
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        
+        navigationItem.hidesBackButton = true
         answerField.delegate = self
-        choiceA.isHidden = true
-        choiceB.isHidden = true
-        choiceC.isHidden = true
-        choiceD.isHidden = true
+        hideButtons()
         checkAnswerLabel.isHidden = true
         
         
@@ -53,7 +52,12 @@ class QuestionController: UIViewController {
         
     }
     
-    
+    func hideButtons(){
+        choiceA.isHidden = true
+        choiceB.isHidden = true
+        choiceC.isHidden = true
+        choiceD.isHidden = true
+    }
     
     @IBAction func startQuiz(_ sender: UIButton) {
         
@@ -63,16 +67,16 @@ class QuestionController: UIViewController {
         quizBrain.changeQuestion()
         QuestionLabel.text = quizBrain.getQuestionText()
         setChoices()
-        choiceA.isHidden = false
-        choiceB.isHidden = false
-        choiceC.isHidden = false
-        choiceD.isHidden = false
+      
+        ScoreLabel.text = "Score: 0"
         
     }
+    
     
     @IBAction func LogOutPressed(_ sender: UIBarButtonItem) {
         let firebaseAuth = Auth.auth()
         do {
+            quizBrain.reset()
             try firebaseAuth.signOut()
             navigationController?.popToRootViewController(animated: true)
         } catch let signOutError as NSError {
@@ -81,12 +85,28 @@ class QuestionController: UIViewController {
     }
     
     @IBAction func answerPressed(_ sender: UIButton) {
+    
         currentNumOfQn += 1
         questionNumLabel.text = "Question \(currentNumOfQn) out of \(quizBrain.numOfCurrentQn)"
         showAnswer(answer: sender.currentTitle!)
     }
     
     
+    @IBAction func leavePressed(_ sender: UIButton) {
+        let loadAlert = UIAlertController(title: nil, message: "Are you sure you want to leave? your current progress would not be saved.", preferredStyle: .alert)
+        loadAlert.addAction(UIAlertAction(title: "Leave", style: .default, handler: { (action) in
+            quizBrain.reset()
+            self.performSegue(withIdentifier: "goToCategory", sender: self)
+        }))
+        loadAlert.addAction(UIAlertAction(title: "Stay", style: .default, handler: { (action) in
+            loadAlert.dismiss(animated: true, completion: nil)
+        }))
+        
+        present(loadAlert, animated: true, completion: nil)
+        
+        
+        
+    }
     
     func showAnswer(answer: String){
         if quizBrain.checkAnswer(answer: answer.lowercased()) == true{
@@ -96,35 +116,66 @@ class QuestionController: UIViewController {
             checkAnswerLabel.text = "You are wrong, the answer is \(quizBrain.getAnswerText())"
         }
         ScoreLabel.text = "Score: \(quizBrain.score)"
+        choiceC.isHidden = false
+        choiceD.isHidden = false
         checkAnswerLabel.isHidden = false
         quizBrain.changeQuestion()
         QuestionLabel.text = quizBrain.getQuestionText()
         setChoices()
+        if currentNumOfQn > quizBrain.numOfCurrentQn {
+            hideButtons()
+            QuestionLabel.isHidden = true
+            questionNumLabel.isHidden = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
+                
+                self.endQuiz()
+            }
+        }
+        
     }
     func setChoices(){
         var index = 0
         var previousNumbers:[Int] = []
-        while index <= 3 {
-            var theNum = Int.random(in: 0...3)
-            while previousNumbers.contains(theNum){
-                theNum = Int.random(in: 0...3)
+        choiceA.isHidden = false
+        choiceB.isHidden = false
+        if quizBrain.getType() == "multiple"{
+            choiceC.isHidden = false
+            choiceD.isHidden = false
+            while index <= 3 {
+                var theNum = Int.random(in: 0...3)
+                while previousNumbers.contains(theNum){
+                    theNum = Int.random(in: 0...3)
+                }
+                switch index {
+                case 0:
+                    choiceA.setTitle(quizBrain.getChoices(choice: theNum), for: .normal)
+                case 1:
+                    choiceB.setTitle(quizBrain.getChoices(choice: theNum), for: .normal)
+                case 2:
+                    choiceC.setTitle(quizBrain.getChoices(choice: theNum), for: .normal)
+                case 3:
+                    choiceD.setTitle(quizBrain.getChoices(choice: theNum), for: .normal)
+                default:
+                    fatalError("nani")
+                }
+                index += 1
+                previousNumbers.append(theNum)
             }
-            switch index {
-            case 0:
-                choiceA.setTitle(quizBrain.getChoices(choice: theNum), for: .normal)
-            case 1:
-                choiceB.setTitle(quizBrain.getChoices(choice: theNum), for: .normal)
-            case 2:
-                choiceC.setTitle(quizBrain.getChoices(choice: theNum), for: .normal)
-            case 3:
-                choiceD.setTitle(quizBrain.getChoices(choice: theNum), for: .normal)
-            default:
-                fatalError("nani")
-            }
-            index += 1
-            previousNumbers.append(theNum)
         }
+        if quizBrain.getType() == "boolean"{
+            choiceC.isHidden = true
+            choiceD.isHidden = true
+            choiceA.setTitle("True", for: .normal)
+            choiceB.setTitle("False", for: .normal)
+            
+        }
+  
     }
+    func endQuiz(){
+        
+        self.performSegue(withIdentifier: "goToScore", sender: self)
+    }
+    
 }
 extension QuestionController: UITextFieldDelegate{
     

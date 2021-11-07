@@ -13,7 +13,7 @@ struct QuizManager {
     
     var amount = Amount(easy: 0, medium: 0, hard: 0)
     var number = 0
-    let quizURL = "https://opentdb.com/api.php?&type=multiple&encode=base64"
+    let quizURL = "https://opentdb.com/api.php?&encode=base64"
     let catLink = "https://opentdb.com/api_count.php?"
     let currentDiff = Difficulty(difficulty: "any")
     
@@ -26,7 +26,7 @@ struct QuizManager {
             if amount.easyQn > 20 {
                 return 20
             }else{
-                return amount.easyQn - 5 //minus 4 because of mythology & math category db gives a wrong number
+                return amount.easyQn - 1 //minus 4 because of mythology & math category db gives a wrong number
             }
         }else if diff == "medium"{
             if amount.mediumQn > 20 {
@@ -38,7 +38,7 @@ struct QuizManager {
             if amount.hardQn > 20 {
                 return 20
             }else{
-                return amount.hardQn - 4 //math hard db category gives wrong number
+                return amount.hardQn - 1 //math hard db category gives wrong number
             }
         }else{
             return 20 
@@ -122,19 +122,26 @@ struct QuizManager {
                     let type = decode64(data:decodedData.results[num].type )
                     let ans = decode64(data:decodedData.results[num].correct_answer )
                     let difficulty = decode64(data:decodedData.results[num].difficulty )
-                    let a = decode64(data:decodedData.results[num].incorrect_answers[0] )
-                    let b = decode64(data:decodedData.results[num].incorrect_answers[1] )
-                    let c = decode64(data:decodedData.results[num].incorrect_answers[2] )
                     
-//                    if type == "multiple"{
-//
-//                    }else{
-//
-//                    }
                     
-                    let question = Question(q: qn, a: a, b: b, c: c, ans: ans, category: category, type: type, difficulty: difficulty)
-                    quizBrain.questionBank.append(question)
-                    num += 1
+                    if type == "multiple"{
+                        let a = decode64(data:decodedData.results[num].incorrect_answers[0] )
+                        let b = decode64(data:decodedData.results[num].incorrect_answers[1] )
+                        let c = decode64(data:decodedData.results[num].incorrect_answers[2] )
+                        let question = Question(q: qn, a: a, b: b, c: c, ans: ans, category: category, type: type, difficulty: difficulty)
+                        quizBrain.questionBank.append(question)
+                        num += 1
+                    }else{
+                        let a = "False"
+                        let b = "0"
+                        let c = "0"
+                        let question = Question(q: qn, a: a, b: b, c: c, ans: ans, category: category, type: type, difficulty: difficulty)
+                        quizBrain.questionBank.append(question)
+                        num += 1
+                        
+                    }
+                    
+                    
                     
                 }
                 quizBrain.numOfCurrentQn = num

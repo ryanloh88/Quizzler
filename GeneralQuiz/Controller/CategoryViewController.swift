@@ -13,7 +13,14 @@ class CategoryViewController :UITableViewController{
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+    }
+    func setDelay(){
+        let loadAlert = UIAlertController(title: nil, message: "Grabbing coffee..", preferredStyle: .alert)
+        present(loadAlert, animated: true, completion: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {        
+            loadAlert.dismiss(animated: true, completion: nil)
+            self.performSegue(withIdentifier: "goToQuestion", sender: self)
+        }
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let message = quizBrain.quizCategories[indexPath.row]
@@ -26,6 +33,11 @@ class CategoryViewController :UITableViewController{
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let loadAlert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
+        present(loadAlert, animated: true, completion: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
+            loadAlert.dismiss(animated: true, completion: nil)
+
         let message = quizBrain.quizCategories[indexPath.row]
         
         let category = quizBrain.quizCategory[message]
@@ -35,28 +47,32 @@ class CategoryViewController :UITableViewController{
         
         let alert = UIAlertController(title: "Choose your difficulty", message: "", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Easy", style: .default, handler: { (action) in
-            
             quizManager.fetchQuiz(category: category!, difficulty: "easy")
-            self.performSegue(withIdentifier: "goToQuestion", sender: self)
+            self.setDelay()
+            
+            
+            
         }))
         alert.addAction(UIAlertAction(title: "Medium", style: .default, handler: { (action) in
             
             quizManager.fetchQuiz(category: category!, difficulty: "medium")
-            self.performSegue(withIdentifier: "goToQuestion", sender: self)
+            self.setDelay()
         }))
         alert.addAction(UIAlertAction(title: "Hard", style: .default, handler: { (action) in
             
             quizManager.fetchQuiz(category: category!, difficulty: "hard")
-            self.performSegue(withIdentifier: "goToQuestion", sender: self)
+            self.setDelay()
         }))
         alert.addAction(UIAlertAction(title: "Any", style: .default, handler: { (action) in
-            
             quizManager.fetchQuiz(category: category!, difficulty: "")
-            self.performSegue(withIdentifier: "goToQuestion", sender: self)
+            self.setDelay()
         }))
-        present(alert, animated: true, completion: nil)
+            
+            self.present(alert, animated: true, completion: nil)
         
-        self.performSegue(withIdentifier: "goToQuestion", sender: self)
+
+        }
+        
     }
     
     }
