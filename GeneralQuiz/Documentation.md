@@ -10,12 +10,13 @@ Track Your progress
 
 
 To do list 
-Fix UI 
-
+Add try again 
+catch error if questions dont load up properly
 Track Previous scores!!
+Save HighScores
 
 
 Should do but kinda laze
 Settle issue where flash chat google service is not working
-fix keyboard textfield thing
+
 

@@ -26,7 +26,7 @@ struct QuizManager {
             if amount.easyQn > 20 {
                 return 20
             }else{
-                return amount.easyQn - 1 //minus 4 because of mythology & math category db gives a wrong number
+                return amount.easyQn - 1
             }
         }else if diff == "medium"{
             if amount.mediumQn > 20 {
@@ -38,7 +38,7 @@ struct QuizManager {
             if amount.hardQn > 20 {
                 return 20
             }else{
-                return amount.hardQn - 1 //math hard db category gives wrong number
+                return amount.hardQn - 1
             }
         }else{
             return 20 
@@ -117,7 +117,6 @@ struct QuizManager {
                 print(getNum(diff: currentDiff.diff))
                 while num < getNum(diff: currentDiff.diff){
                     let qn = decode64(data: decodedData.results[num].question)
-                    
                     let category = decode64(data: decodedData.results[num].category)
                     let type = decode64(data:decodedData.results[num].type )
                     let ans = decode64(data:decodedData.results[num].correct_answer )

@@ -24,18 +24,18 @@ class RegisterViewController:UIViewController{
         //step 1 in making user database
         if let email = emailTextField.text, let password = passwordTextField.text{
             Auth.auth().createUser(withEmail: email, password: password){ authResult, error in
-                if let e = error{
-                    self.errorLabel.text = "There was an error authenticating your account: \(e.localizedDescription)"
+                if let e = error {
+                    self.errorLabel.text = e.localizedDescription
                     return
                 }else{
                     self.performSegue(withIdentifier: "goToCategory", sender: self)
-//                 
                 }
             }
         }
-        
-        
-        
-        
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "goToCategory" {
+            navigationItem.backButtonTitle = ""
+        }
     }
 }

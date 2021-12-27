@@ -14,6 +14,7 @@ class QuestionController: UIViewController {
     
     @IBOutlet weak var QuestionLabel: UILabel!
     
+    @IBOutlet weak var endQuizLabel: UIButton!
     @IBOutlet weak var typeAnswer: UILabel!
     
     @IBOutlet weak var answerField: UITextField!
@@ -44,10 +45,10 @@ class QuestionController: UIViewController {
         checkAnswerLabel.isHidden = true
         
         
-        //Until I figure out a way to use the textfield
         typeAnswer.isHidden = true
         answerField.isHidden = true
         submitPressed.isHidden = true
+        
         
         
     }
@@ -57,13 +58,22 @@ class QuestionController: UIViewController {
         choiceB.isHidden = true
         choiceC.isHidden = true
         choiceD.isHidden = true
+        ScoreLabel.isHidden = true
+        questionNumLabel.isHidden = true
+        QuestionLabel.isHidden = true
+        endQuizLabel.isHidden = true
+        
     }
     
     @IBAction func startQuiz(_ sender: UIButton) {
         
         questionNumLabel.text = "Question \(currentNumOfQn) out of \(quizBrain.numOfCurrentQn)"
         print("yp\(quizBrain.numOfCurrentQn)")
-        startQuiz.isHidden = true 
+        startQuiz.isHidden = true
+        ScoreLabel.isHidden = false
+        questionNumLabel.isHidden = false
+        QuestionLabel.isHidden = false
+        endQuizLabel.isHidden = false
         quizBrain.changeQuestion()
         QuestionLabel.text = quizBrain.getQuestionText()
         setChoices()
@@ -75,13 +85,21 @@ class QuestionController: UIViewController {
     
     @IBAction func LogOutPressed(_ sender: UIBarButtonItem) {
         let firebaseAuth = Auth.auth()
-        do {
-            quizBrain.reset()
-            try firebaseAuth.signOut()
-            navigationController?.popToRootViewController(animated: true)
-        } catch let signOutError as NSError {
-            print("Error signing out: %@", signOutError)
-        }
+        
+            let loadAlert = UIAlertController(title: nil, message: "Are you sure you want to Log out?", preferredStyle: .alert)
+            loadAlert.addAction(UIAlertAction(title: "Log out", style: .default, handler: { (action) in
+                do{
+                    quizBrain.reset()
+                    try firebaseAuth.signOut()
+                    self.navigationController?.popToRootViewController(animated: true)
+                } catch let signOutError as NSError {
+                    print("Error signing out: %@", signOutError)
+                }
+            }))
+            loadAlert.addAction(UIAlertAction(title: "Stay", style: .default, handler: { (action) in
+                loadAlert.dismiss(animated: true, completion: nil)
+            }))
+        present(loadAlert, animated: true, completion: nil)
     }
     
     @IBAction func answerPressed(_ sender: UIButton) {
@@ -136,6 +154,7 @@ class QuestionController: UIViewController {
     func setChoices(){
         var index = 0
         var previousNumbers:[Int] = []
+        
         choiceA.isHidden = false
         choiceB.isHidden = false
         if quizBrain.getType() == "multiple"{
